@@ -95,15 +95,15 @@ var getBlockBySelector = function (target, block) {
   var ctx = block || document;
 
   return ctx.querySelector(target);
-}
+};
 
 // remove hidden class
 var removeHiddenFromBlock = function (ctx) {
   ctx.classList.remove('hidden');
-}
+};
 
 // show setup block and render similar wizards
-var renderSetup = function(props) {
+var renderSetup = function (props) {
   // generate users
   var users = generateUsers(props);
   // find setup block
