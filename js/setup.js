@@ -225,6 +225,7 @@ var createSetupListeners = function (ctx, props) {
   setupOpen.addEventListener('keydown', onEnterPress);
 
   // way to close setup popup
+  setupClose.addEventListener('click', closeSetupPopup);
   setupClose.addEventListener('keydown', onEnterPress);
 
   // prevent esc if name input focused
