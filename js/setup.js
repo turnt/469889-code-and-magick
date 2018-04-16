@@ -1,4 +1,8 @@
 'use strict';
+var keycodes = {
+  esc: 27,
+  enter: 13,
+};
 // props from task
 var setupProps = {
   numberOfUsers: 4,
@@ -41,6 +45,14 @@ var setupProps = {
     'yellow',
     'green',
   ],
+
+  fireballColors: [
+    '#ee4830',
+    '#30a8ee',
+    '#5ce6c0',
+    '#e848d5',
+    '#e6e848',
+  ],
 };
 
 // return random value from array
@@ -55,7 +67,8 @@ var generateUsers = function (props) {
   for (var i = 0, length = props.numberOfUsers; i < length; i += 1) {
     var user = {};
 
-    user.name = getRandomArrayItem(props.names) + ' ' + getRandomArrayItem(props.surnames);
+    user.name = getRandomArrayItem(props.names) + ' ' +
+      getRandomArrayItem(props.surnames);
     user.coatColor = getRandomArrayItem(props.coatColors);
     user.eyesColor = getRandomArrayItem(props.eyesColors);
 
@@ -102,24 +115,26 @@ var removeHiddenFromBlock = function (ctx) {
   ctx.classList.remove('hidden');
 };
 
+// add hidden class
+var addHiddenForBlock = function (ctx) {
+  ctx.classList.add('hidden');
+};
+
 // show setup block and render similar wizards
-var renderSetup = function (props) {
+var renderSetup = function (ctx, props) {
   // generate users
   var users = generateUsers(props);
-  // find setup block
-  var setupBlock = getBlockBySelector('.setup');
   // similar block in setup
-  var setupSimilar = getBlockBySelector('.setup-similar', setupBlock);
-
-  // get template for wizards
-  var template = getBlockBySelector('#similar-wizard-template');
-  var templateItem = getBlockBySelector('.setup-similar-item', template.content);
-
+  var setupSimilar = getBlockBySelector('.setup-similar', ctx);
   // get block for list of wizards
   var similarWizardsList = getBlockBySelector('.setup-similar-list');
 
-  // make setup block visible
-  removeHiddenFromBlock(setupBlock);
+  // get template for wizards
+  var template = getBlockBySelector('#similar-wizard-template');
+  var templateItem = getBlockBySelector(
+      '.setup-similar-item',
+      template.content
+  );
 
   // render list with generated users
   renderSimilarWizards(users, templateItem, similarWizardsList);
@@ -128,4 +143,106 @@ var renderSetup = function (props) {
   removeHiddenFromBlock(setupSimilar);
 };
 
-renderSetup(setupProps);
+// create listeners for setup block
+var createSetupListeners = function (ctx, props) {
+  var setupOpen = getBlockBySelector('.setup-open');
+  var setupClose = getBlockBySelector('.setup-close', ctx);
+
+  var userName = getBlockBySelector('.setup-title .setup-user-name', ctx);
+  var userEyes = getBlockBySelector('.setup-player .wizard-eyes', ctx);
+  var userCoat = getBlockBySelector('.setup-player .wizard-coat', ctx);
+  var userFireball = getBlockBySelector(
+      '.setup-player .setup-fireball-wrap',
+      ctx
+  );
+
+  // rule of escape key for setup hidden
+  var onPopupEscPress = function (e) {
+    if (e.keyCode === keycodes.esc) {
+      closeSetupPopup();
+    }
+  };
+
+  // rule of enter key for setup popup visibility
+  var onEnterPress = function (e) {
+    if (e.keyCode === keycodes.enter) {
+      if (ctx.classList.contains('hidden')) {
+        openSetupPopup();
+      } else {
+        closeSetupPopup();
+      }
+    }
+  };
+
+  var openSetupPopup = function () {
+    removeHiddenFromBlock(ctx);
+    document.addEventListener('keydown', onPopupEscPress);
+  };
+
+  var closeSetupPopup = function () {
+    addHiddenForBlock(ctx);
+    document.removeEventListener('keydown', onPopupEscPress);
+  };
+
+  // on eyes click
+  var onClickEyes = function () {
+    var newColor = getRandomArrayItem(props.eyesColors);
+    var hiddenEyesInput = getBlockBySelector(
+        'input[name="eyes-color"]',
+        ctx
+    );
+
+    userEyes.style.fill = newColor;
+    hiddenEyesInput.value = newColor;
+  };
+
+  // on fireball click
+  var onClickFireball = function () {
+    var newColor = getRandomArrayItem(props.fireballColors);
+    var hiddenFireballInput = getBlockBySelector(
+        'input[name="fireball-color"]',
+        ctx
+    );
+
+    userFireball.style.backgroundColor = newColor;
+    hiddenFireballInput.value = newColor;
+  };
+
+  // on coat click
+  var onClickCoat = function () {
+    var newColor = getRandomArrayItem(props.coatColors);
+    var hiddenCoatInput = getBlockBySelector(
+        'input[name="coat-color"]',
+        ctx
+    );
+
+    userCoat.style.fill = newColor;
+    hiddenCoatInput.value = newColor;
+  };
+
+  // ways to open setup popup
+  setupOpen.addEventListener('click', openSetupPopup);
+  setupOpen.addEventListener('keydown', onEnterPress);
+
+  // way to close setup popup
+  setupClose.addEventListener('click', closeSetupPopup);
+  setupClose.addEventListener('keydown', onEnterPress);
+
+  // prevent esc if name input focused
+  userName.addEventListener('keydown', function (e) {
+    if (e.keyCode === keycodes.esc) {
+      e.stopPropagation();
+    }
+  });
+
+  // wizard colors customization
+  userEyes.addEventListener('click', onClickEyes);
+  userCoat.addEventListener('click', onClickCoat);
+  userFireball.addEventListener('click', onClickFireball);
+};
+
+// find setup block
+var setupBlock = getBlockBySelector('.setup');
+
+renderSetup(setupBlock, setupProps);
+createSetupListeners(setupBlock, setupProps);
