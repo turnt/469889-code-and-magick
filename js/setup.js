@@ -86,9 +86,6 @@ window.getWizardY = function(height) {
           '#e6e848',
         ],
       },
-
-      width: 70,
-      position: 2 / 3,
     },
   };
 
