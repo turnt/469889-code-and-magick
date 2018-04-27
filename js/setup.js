@@ -4,24 +4,24 @@ window.fireballSize = 22;
 window.wizardSpeed = 3;
 window.wizardWidth = 70;
 
-window.getFireballSpeed = function(left) {
+window.getFireballSpeed = function (left) {
   var beforeWind = 5;
   var againstWind = 2;
 
   return left ? beforeWind : againstWind;
 };
 
-window.getWizardHeight = function() {
+window.getWizardHeight = function () {
   var heightRatio = 1.337;
 
-  return heightRatio * wizardWidth;
+  return heightRatio * window.wizardWidth;
 };
 
-window.getWizardX = function(width) {
-  return width / 2 - wizardWidth / 2;
+window.getWizardX = function (width) {
+  return width / 2 - window.wizardWidth / 2;
 };
 
-window.getWizardY = function(height) {
+window.getWizardY = function (height) {
   var wizardPosition = 1 - 2 / 3;
 
   return height * wizardPosition;
@@ -96,10 +96,10 @@ window.getWizardY = function(height) {
     for (var i = 0, length = props.numberOfUsers; i < length; i += 1) {
       var user = {};
 
-      user.name = util.getRandomArrayItem(props.names) + ' ' +
-          util.getRandomArrayItem(props.surnames);
-      user.coatColor = util.getRandomArrayItem(props.wizard.coatColors);
-      user.eyesColor = util.getRandomArrayItem(props.wizard.eyesColors);
+      user.name = window.util.getRandomArrayItem(props.names) + ' ' +
+          window.util.getRandomArrayItem(props.surnames);
+      user.coatColor = window.util.getRandomArrayItem(props.wizard.coatColors);
+      user.eyesColor = window.util.getRandomArrayItem(props.wizard.eyesColors);
 
       users.push(user);
     }
@@ -148,7 +148,7 @@ window.getWizardY = function(height) {
     renderSimilarWizards(users, templateItem, similarWizardsList);
 
     // make block of similar wizards visible
-    util.toggleClass(setupSimilar, 'hidden');
+    window.util.toggleClass(setupSimilar, 'hidden');
   };
 
   // create listeners for setup block
@@ -164,14 +164,14 @@ window.getWizardY = function(height) {
     var userFireball = ctx.querySelector('.setup-player .setup-fireball-wrap');
 
     var openSetupPopup = function () {
-      util.toggleClass(ctx, 'hidden');
+      window.util.toggleClass(ctx, 'hidden');
       document.addEventListener('keydown', onPopupEscPress);
     };
 
     var closeSetupPopup = function () {
-      util.toggleClass(ctx, 'hidden');
-      ctx.style.left = initialContextPositionX;
-      ctx.style.top = initialContextPositionY;
+      window.util.toggleClass(ctx, 'hidden');
+      ctx.style.left = initialCtxPositionX;
+      ctx.style.top = initialCtxPositionY;
       document.removeEventListener('keydown', onPopupEscPress);
     };
 
@@ -195,7 +195,7 @@ window.getWizardY = function(height) {
 
     // on eyes click
     var onClickEyes = function () {
-      var newColor = util.getRandomArrayItem(props.wizard.eyesColors);
+      var newColor = window.util.getRandomArrayItem(props.wizard.eyesColors);
       var hiddenEyesInput = ctx.querySelector('input[name="eyes-color"]');
 
       userEyes.style.fill = newColor;
@@ -204,7 +204,7 @@ window.getWizardY = function(height) {
 
     // on fireball click
     var onClickFireball = function () {
-      var newColor = util.getRandomArrayItem(props.wizard.fireball.colors);
+      var newColor = window.util.getRandomArrayItem(props.wizard.fireball.colors);
       var hiddenFireballInput = ctx.querySelector(
           'input[name="fireball-color"]'
       );
@@ -215,7 +215,7 @@ window.getWizardY = function(height) {
 
     // on coat click
     var onClickCoat = function () {
-      var newColor = util.getRandomArrayItem(props.wizard.coatColors);
+      var newColor = window.util.getRandomArrayItem(props.wizard.coatColors);
       var hiddenCoatInput = ctx.querySelector('input[name="coat-color"]');
 
       userCoat.style.fill = newColor;

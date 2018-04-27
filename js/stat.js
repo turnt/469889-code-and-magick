@@ -84,7 +84,7 @@
 
   // draw graph
   var renderGraph = function (ctx, props, players, times) {
-    var maxTime = util.getMaxElement(times);
+    var maxTime = window.util.getMaxElement(times);
     var lineHeight = props.getTextLineHeight();
     var titleHeight = props.title.length * lineHeight;
 
