@@ -1,248 +1,322 @@
 'use strict';
-var keycodes = {
-  esc: 27,
-  enter: 13,
-};
-// props from task
-var setupProps = {
-  numberOfUsers: 4,
+// starter
+window.fireballSize = 22;
+window.wizardSpeed = 3;
+window.wizardWidth = 70;
 
-  names: [
-    'Иван',
-    'Хуан Себастьян',
-    'Мария',
-    'Кристоф',
-    'Виктор',
-    'Юлия',
-    'Люпита',
-    'Вашингтон',
-  ],
+window.getFireballSpeed = function (left) {
+  var beforeWind = 5;
+  var againstWind = 2;
 
-  surnames: [
-    'да Марья',
-    'Верон',
-    'Мирабелла',
-    'Вальц',
-    'Онопко',
-    'Топольницкая',
-    'Нионго',
-    'Ирвинг',
-  ],
-
-  coatColors: [
-    'rgb(101, 137, 164)',
-    'rgb(241, 43, 107)',
-    'rgb(146, 100, 161)',
-    'rgb(56, 159, 117)',
-    'rgb(215, 210, 55)',
-    'rgb(0, 0, 0)',
-  ],
-
-  eyesColors: [
-    'black',
-    'red',
-    'blue',
-    'yellow',
-    'green',
-  ],
-
-  fireballColors: [
-    '#ee4830',
-    '#30a8ee',
-    '#5ce6c0',
-    '#e848d5',
-    '#e6e848',
-  ],
+  return left ? beforeWind : againstWind;
 };
 
-// return random value from array
-var getRandomArrayItem = function (arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+window.getWizardHeight = function () {
+  var heightRatio = 1.337;
+
+  return heightRatio * window.wizardWidth;
 };
 
-// generate array of objects with users
-var generateUsers = function (props) {
-  var users = [];
-
-  for (var i = 0, length = props.numberOfUsers; i < length; i += 1) {
-    var user = {};
-
-    user.name = getRandomArrayItem(props.names) + ' ' +
-      getRandomArrayItem(props.surnames);
-    user.coatColor = getRandomArrayItem(props.coatColors);
-    user.eyesColor = getRandomArrayItem(props.eyesColors);
-
-    users.push(user);
-  }
-
-  return users;
+window.getWizardX = function (width) {
+  return width / 2 - window.wizardWidth / 2;
 };
 
-// return wizard filled by template
-var renderWizard = function (user, template) {
-  var wizard = template.cloneNode(true);
+window.getWizardY = function (height) {
+  var wizardPosition = 1 - 2 / 3;
 
-  wizard.querySelector('.setup-similar-label').textContent = user.name;
-  wizard.querySelector('.wizard-coat').style.fill = user.coatColor;
-  wizard.querySelector('.wizard-eyes').style.fill = user.eyesColor;
-
-  return wizard;
+  return height * wizardPosition;
 };
 
-// render wizards to list block
-var renderSimilarWizards = function (users, template, target) {
-  // use fragment for creating full list of wizards
-  var fragment = document.createDocumentFragment();
-
-  for (var i = 0, length = users.length; i < length; i += 1) {
-    fragment.appendChild(renderWizard(users[i], template));
-  }
-
-  // fill target block with fragment
-  target.appendChild(fragment);
-};
-
-// get element by selector from document or optional block
-var getBlockBySelector = function (target, block) {
-  // get context
-  var ctx = block || document;
-
-  return ctx.querySelector(target);
-};
-
-// remove hidden class
-var removeHiddenFromBlock = function (ctx) {
-  ctx.classList.remove('hidden');
-};
-
-// add hidden class
-var addHiddenForBlock = function (ctx) {
-  ctx.classList.add('hidden');
-};
-
-// show setup block and render similar wizards
-var renderSetup = function (ctx, props) {
-  // generate users
-  var users = generateUsers(props);
-  // similar block in setup
-  var setupSimilar = getBlockBySelector('.setup-similar', ctx);
-  // get block for list of wizards
-  var similarWizardsList = getBlockBySelector('.setup-similar-list');
-
-  // get template for wizards
-  var template = getBlockBySelector('#similar-wizard-template');
-  var templateItem = getBlockBySelector(
-      '.setup-similar-item',
-      template.content
-  );
-
-  // render list with generated users
-  renderSimilarWizards(users, templateItem, similarWizardsList);
-
-  // make block of similar wizards visible
-  removeHiddenFromBlock(setupSimilar);
-};
-
-// create listeners for setup block
-var createSetupListeners = function (ctx, props) {
-  var setupOpen = getBlockBySelector('.setup-open');
-  var setupClose = getBlockBySelector('.setup-close', ctx);
-
-  var userName = getBlockBySelector('.setup-title .setup-user-name', ctx);
-  var userEyes = getBlockBySelector('.setup-player .wizard-eyes', ctx);
-  var userCoat = getBlockBySelector('.setup-player .wizard-coat', ctx);
-  var userFireball = getBlockBySelector(
-      '.setup-player .setup-fireball-wrap',
-      ctx
-  );
-
-  // rule of escape key for setup hidden
-  var onPopupEscPress = function (e) {
-    if (e.keyCode === keycodes.esc) {
-      closeSetupPopup();
-    }
+(function () {
+  // keycodes
+  var keycodes = {
+    ESC: 27,
+    ENTER: 13,
   };
 
-  // rule of enter key for setup popup visibility
-  var onEnterPress = function (e) {
-    if (e.keyCode === keycodes.enter) {
-      if (ctx.classList.contains('hidden')) {
-        openSetupPopup();
-      } else {
+  var setupProps = {
+    numberOfUsers: 4,
+
+    names: [
+      'Иван',
+      'Хуан Себастьян',
+      'Мария',
+      'Кристоф',
+      'Виктор',
+      'Юлия',
+      'Люпита',
+      'Вашингтон',
+    ],
+
+    surnames: [
+      'да Марья',
+      'Верон',
+      'Мирабелла',
+      'Вальц',
+      'Онопко',
+      'Топольницкая',
+      'Нионго',
+      'Ирвинг',
+    ],
+
+    wizard: {
+      coatColors: [
+        'rgb(101, 137, 164)',
+        'rgb(241, 43, 107)',
+        'rgb(146, 100, 161)',
+        'rgb(56, 159, 117)',
+        'rgb(215, 210, 55)',
+        'rgb(0, 0, 0)',
+      ],
+
+      eyesColors: [
+        'black',
+        'red',
+        'blue',
+        'yellow',
+        'green',
+      ],
+
+      fireball: {
+        colors: [
+          '#ee4830',
+          '#30a8ee',
+          '#5ce6c0',
+          '#e848d5',
+          '#e6e848',
+        ],
+      },
+    },
+  };
+
+  // generate array of objects with users
+  var generateUsers = function (props) {
+    var users = [];
+
+    for (var i = 0, length = props.numberOfUsers; i < length; i += 1) {
+      var user = {};
+
+      user.name = window.util.getRandomArrayItem(props.names) + ' ' +
+          window.util.getRandomArrayItem(props.surnames);
+      user.coatColor = window.util.getRandomArrayItem(props.wizard.coatColors);
+      user.eyesColor = window.util.getRandomArrayItem(props.wizard.eyesColors);
+
+      users.push(user);
+    }
+
+    return users;
+  };
+
+  // return wizard filled by template
+  var renderWizard = function (user, template) {
+    var wizard = template.cloneNode(true);
+
+    wizard.querySelector('.setup-similar-label').textContent = user.name;
+    wizard.querySelector('.wizard-coat').style.fill = user.coatColor;
+    wizard.querySelector('.wizard-eyes').style.fill = user.eyesColor;
+
+    return wizard;
+  };
+
+  // render wizards to list block
+  var renderSimilarWizards = function (users, template, target) {
+    // use fragment for creating full list of wizards
+    var fragment = document.createDocumentFragment();
+
+    for (var i = 0, length = users.length; i < length; i += 1) {
+      fragment.appendChild(renderWizard(users[i], template));
+    }
+
+    // fill target block with fragment
+    target.appendChild(fragment);
+  };
+
+  // show setup block and render similar wizards
+  var renderSetup = function (ctx, props) {
+    // generate users
+    var users = generateUsers(props);
+    // similar block in setup
+    var setupSimilar = ctx.querySelector('.setup-similar');
+    // get block for list of wizards
+    var similarWizardsList = setupSimilar.querySelector('.setup-similar-list');
+
+    // get template for wizards
+    var template = document.querySelector('#similar-wizard-template');
+    var templateItem = template.content.querySelector('.setup-similar-item');
+
+    // render list with generated users
+    renderSimilarWizards(users, templateItem, similarWizardsList);
+
+    // make block of similar wizards visible
+    window.util.toggleClass(setupSimilar, 'hidden');
+  };
+
+  // create listeners for setup block
+  var createSetupListeners = function (ctx, props) {
+    var initialCtxPositionX = ctx.style.left;
+    var initialCtxPositionY = ctx.style.top;
+    var setupOpen = document.querySelector('.setup-open');
+    var setupClose = ctx.querySelector('.setup-close');
+
+    var userName = ctx.querySelector('.setup-title .setup-user-name');
+    var userEyes = ctx.querySelector('.setup-player .wizard-eyes');
+    var userCoat = ctx.querySelector('.setup-player .wizard-coat');
+    var userFireball = ctx.querySelector('.setup-player .setup-fireball-wrap');
+
+    var openSetupPopup = function () {
+      window.util.toggleClass(ctx, 'hidden');
+      document.addEventListener('keydown', onPopupEscPress);
+    };
+
+    var closeSetupPopup = function () {
+      window.util.toggleClass(ctx, 'hidden');
+      ctx.style.left = initialCtxPositionX;
+      ctx.style.top = initialCtxPositionY;
+      document.removeEventListener('keydown', onPopupEscPress);
+    };
+
+    // rule of escape key for setup hidden
+    var onPopupEscPress = function (e) {
+      if (e.keyCode === keycodes.ESC) {
         closeSetupPopup();
       }
+    };
+
+    // rule of enter key for setup popup visibility
+    var onEnterPress = function (e) {
+      if (e.keyCode === keycodes.ENTER) {
+        if (ctx.classList.contains('hidden')) {
+          openSetupPopup();
+        } else {
+          closeSetupPopup();
+        }
+      }
+    };
+
+    // on eyes click
+    var onClickEyes = function () {
+      var newColor = window.util.getRandomArrayItem(props.wizard.eyesColors);
+      var hiddenEyesInput = ctx.querySelector('input[name="eyes-color"]');
+
+      userEyes.style.fill = newColor;
+      hiddenEyesInput.value = newColor;
+    };
+
+    // on fireball click
+    var onClickFireball = function () {
+      var newColor = window.util.getRandomArrayItem(props.wizard.fireball.colors);
+      var hiddenFireballInput = ctx.querySelector(
+          'input[name="fireball-color"]'
+      );
+
+      userFireball.style.backgroundColor = newColor;
+      hiddenFireballInput.value = newColor;
+    };
+
+    // on coat click
+    var onClickCoat = function () {
+      var newColor = window.util.getRandomArrayItem(props.wizard.coatColors);
+      var hiddenCoatInput = ctx.querySelector('input[name="coat-color"]');
+
+      userCoat.style.fill = newColor;
+      hiddenCoatInput.value = newColor;
+    };
+
+    // ways to open setup popup
+    setupOpen.addEventListener('click', openSetupPopup);
+    setupOpen.addEventListener('keydown', onEnterPress);
+
+    // way to close setup popup
+    setupClose.addEventListener('click', closeSetupPopup);
+    setupClose.addEventListener('keydown', onEnterPress);
+
+    // prevent esc if name input focused
+    userName.addEventListener('keydown', function (e) {
+      if (e.keyCode === keycodes.ESC) {
+        e.stopPropagation();
+      }
+    });
+
+    // wizard colors customization
+    userEyes.addEventListener('click', onClickEyes);
+    userCoat.addEventListener('click', onClickCoat);
+    userFireball.addEventListener('click', onClickFireball);
+  };
+
+  // find setup block
+  var setupBlock = document.querySelector('.setup');
+
+  renderSetup(setupBlock, setupProps);
+  createSetupListeners(setupBlock, setupProps);
+})();
+
+(function () {
+  var setupArtifacts = 'setup-artifacts';
+  var artifactCell = setupArtifacts + '-cell';
+  var artifactsShop = setupArtifacts + '-shop';
+  var dragged;
+
+  var artifactsCells = window.setupPopup.querySelectorAll('.' + artifactCell + ' > *');
+  var setupArtifactsZone = window.setupPopup.querySelector('.' + setupArtifacts);
+
+  var dragRule = function (target) {
+    if (target.parentNode.className !== artifactsShop &&
+        target.className === artifactCell &&
+        target.children.length === 0) {
+      return true;
     }
+    return false;
   };
 
-  var openSetupPopup = function () {
-    removeHiddenFromBlock(ctx);
-    document.addEventListener('keydown', onPopupEscPress);
-  };
+  // mark content of cell as draggable
+  for (var i = 0; i < artifactsCells.length; i += 1) {
+    artifactsCells[i].draggable = true;
+  }
 
-  var closeSetupPopup = function () {
-    addHiddenForBlock(ctx);
-    document.removeEventListener('keydown', onPopupEscPress);
-  };
+  // highlight dropzone
+  document.addEventListener('dragstart', function (e) {
+    dragged = e.target;
+    setupArtifactsZone.style.outline = '2px dashed red';
+  });
 
-  // on eyes click
-  var onClickEyes = function () {
-    var newColor = getRandomArrayItem(props.eyesColors);
-    var hiddenEyesInput = getBlockBySelector(
-        'input[name="eyes-color"]',
-        ctx
-    );
+  // prevent default actions when dragging
+  document.addEventListener('dragover', function (e) {
+    e.preventDefault();
+  });
 
-    userEyes.style.fill = newColor;
-    hiddenEyesInput.value = newColor;
-  };
-
-  // on fireball click
-  var onClickFireball = function () {
-    var newColor = getRandomArrayItem(props.fireballColors);
-    var hiddenFireballInput = getBlockBySelector(
-        'input[name="fireball-color"]',
-        ctx
-    );
-
-    userFireball.style.backgroundColor = newColor;
-    hiddenFireballInput.value = newColor;
-  };
-
-  // on coat click
-  var onClickCoat = function () {
-    var newColor = getRandomArrayItem(props.coatColors);
-    var hiddenCoatInput = getBlockBySelector(
-        'input[name="coat-color"]',
-        ctx
-    );
-
-    userCoat.style.fill = newColor;
-    hiddenCoatInput.value = newColor;
-  };
-
-  // ways to open setup popup
-  setupOpen.addEventListener('click', openSetupPopup);
-  setupOpen.addEventListener('keydown', onEnterPress);
-
-  // way to close setup popup
-  setupClose.addEventListener('click', closeSetupPopup);
-  setupClose.addEventListener('keydown', onEnterPress);
-
-  // prevent esc if name input focused
-  userName.addEventListener('keydown', function (e) {
-    if (e.keyCode === keycodes.esc) {
-      e.stopPropagation();
+  // drag enter cell
+  document.addEventListener('dragenter', function (e) {
+    // highlight potential target if it's empty
+    if (dragRule(e.target)) {
+      e.target.style.background = 'yellow';
     }
   });
 
-  // wizard colors customization
-  userEyes.addEventListener('click', onClickEyes);
-  userCoat.addEventListener('click', onClickCoat);
-  userFireball.addEventListener('click', onClickFireball);
-};
+  // drag leave cell
+  document.addEventListener('dragleave', function (e) {
+    if (e.target.className === artifactCell) {
+      e.target.style.background = null;
+    }
+  });
 
-// find setup block
-var setupBlock = getBlockBySelector('.setup');
+  // drop item to cell
+  document.addEventListener('drop', function (e) {
+    e.preventDefault();
+    // reset dropzone outline style
+    setupArtifactsZone.style.outline = null;
+    // move dragged item if it's empty
+    if (dragRule(e.target)) {
+      // reset background
+      e.target.style.background = null;
 
-renderSetup(setupBlock, setupProps);
-createSetupListeners(setupBlock, setupProps);
+      var item = dragged.cloneNode();
+
+      // if dragging started not from shop
+      if (e.target.parentNode.className === setupArtifacts &&
+          dragged.parentNode.parentNode.className !== artifactsShop) {
+        dragged.parentNode.removeChild(dragged);
+      }
+      e.target.appendChild(item);
+    }
+  });
+})();
