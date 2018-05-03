@@ -47,6 +47,7 @@
     },
   };
 
+  // change ctx fillStyle color
   var changeColor = function (ctx, color) {
     ctx.fillStyle = color;
   };
@@ -131,6 +132,7 @@
     }
   };
 
+  // render statistics
   window.renderStatistics = function (ctx, names, times) {
     renderCloud(ctx, statistics);
     renderTitle(ctx, statistics);

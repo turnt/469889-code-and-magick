@@ -1,18 +1,6 @@
 'use strict';
 
 (function () {
-  // get element by selector from document or optional block
-  var getNodesBySelector = function (selector, node) {
-    // get context
-    var ctx = node || document;
-
-    if (node && ctx.length) {
-      return ctx.querySelectorAll(selector);
-    }
-
-    return ctx.querySelector(selector);
-  };
-
   // remove hidden class
   var toggleClass = function (ctx, className) {
     ctx.classList.toggle(className);
@@ -36,8 +24,8 @@
     return maxElement;
   };
 
+  // export utils
   window.util = {
-    getNodesBySelector: getNodesBySelector,
     toggleClass: toggleClass,
     getRandomArrayItem: getRandomArrayItem,
     getMaxElement: getMaxElement,

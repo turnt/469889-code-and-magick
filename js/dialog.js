@@ -23,12 +23,12 @@
 
       var shift = {
         x: startCoords.x - moveEvt.clientX,
-        y: startCoords.y - moveEvt.clientY
+        y: startCoords.y - moveEvt.clientY,
       };
 
       startCoords = {
         x: moveEvt.clientX,
-        y: moveEvt.clientY
+        y: moveEvt.clientY,
       };
 
       setup.style.top = (setup.offsetTop - shift.y) + 'px';
@@ -48,5 +48,6 @@
 
   uploadNode.addEventListener('mousedown', handleSetupForDrag);
 
+  // export setup popup
   window.setupPopup = setup;
 })();

@@ -243,11 +243,8 @@ window.getWizardY = function (height) {
     userFireball.addEventListener('click', onClickFireball);
   };
 
-  // find setup block
-  var setupBlock = document.querySelector('.setup');
-
-  renderSetup(setupBlock, setupProps);
-  createSetupListeners(setupBlock, setupProps);
+  renderSetup(window.setupPopup, setupProps);
+  createSetupListeners(window.setupPopup, setupProps);
 })();
 
 (function () {
