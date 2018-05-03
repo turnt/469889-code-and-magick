@@ -1,6 +1,6 @@
 'use strict';
 
-(function(){
+(function () {
   var errorCode = {
     OK: 200,
     BAD_REQUEST: 400,
@@ -63,5 +63,5 @@
   window.backend = {
     load: load,
     save: save,
-  }
+  };
 })();
