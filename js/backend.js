@@ -11,10 +11,17 @@
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
+    var alert = document.querySelector('#system-alert');
+
+    if (alert) {
+      alert.parentNode.removeChild(alert);
+    }
+
     xhr.addEventListener('load', function () {
       switch (xhr.status) {
         case errorCode.OK:
           onLoad(xhr.response);
+
           break;
         case errorCode.BAD_REQUEST:
           onError('Неверный запрос');

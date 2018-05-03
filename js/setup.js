@@ -259,6 +259,7 @@ window.getWizardY = function (height) {
     }
 
     node.textContent = errorMessage;
+    node.id = 'system-alert';
     document.body.insertAdjacentElement('beforeend', node);
   };
 
