@@ -1,8 +1,6 @@
 'use strict';
 
 (function(){
-  var URL = 'https://js.dump.academy/code-and-magick/data';
-
   var errorCode = {
     OK: 200,
     BAD_REQUEST: 400,
@@ -36,7 +34,7 @@
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
 
-    xhr.timeout = 1; // 10s
+    xhr.timeout = 10000; // 10s
 
     return xhr;
   };
@@ -44,14 +42,14 @@
   var load = function (onLoad, onError) {
     var xhr = xhrLoad(onLoad, onError);
 
-    xhr.open('GET', URL);
+    xhr.open('GET', 'https://js.dump.academy/code-and-magick/data');
     xhr.send();
   };
 
   var save = function (data, onLoad, onError) {
     var xhr = xhrLoad(onLoad, onError);
 
-    xhr.open('GET', URL);
+    xhr.open('POST', 'https://js.dump.academy/code-and-magick');
     xhr.send(data);
   };
 

@@ -247,9 +247,9 @@ window.getWizardY = function (height) {
       color: 'red',
       textAlign: 'center',
       width: '100%',
-      padding: '5vh 0',
+      padding: '2vh 0',
       backgroundColor: '#fff',
-      boxShadow: '0 2px 4px 4px rgba(0, 0, 0, 0.4)',
+      boxShadow: '0 2px 4px 2px rgba(0, 0, 0, 0.4)',
     };
 
     var keys = Object.keys(alertStyle);
