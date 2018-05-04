@@ -89,31 +89,13 @@ window.getWizardY = function (height) {
     },
   };
 
-  // generate array of objects with users
-  var generateUsers = function (props) {
-    var users = [];
-
-    for (var i = 0, length = props.numberOfUsers; i < length; i += 1) {
-      var user = {};
-
-      user.name = window.util.getRandomArrayItem(props.names) + ' ' +
-          window.util.getRandomArrayItem(props.surnames);
-      user.coatColor = window.util.getRandomArrayItem(props.wizard.coatColors);
-      user.eyesColor = window.util.getRandomArrayItem(props.wizard.eyesColors);
-
-      users.push(user);
-    }
-
-    return users;
-  };
-
   // return wizard filled by template
   var renderWizard = function (user, template) {
     var wizard = template.cloneNode(true);
 
     wizard.querySelector('.setup-similar-label').textContent = user.name;
-    wizard.querySelector('.wizard-coat').style.fill = user.coatColor;
-    wizard.querySelector('.wizard-eyes').style.fill = user.eyesColor;
+    wizard.querySelector('.wizard-coat').style.fill = user.colorCoat;
+    wizard.querySelector('.wizard-eyes').style.fill = user.colorEyes;
 
     return wizard;
   };
@@ -132,9 +114,7 @@ window.getWizardY = function (height) {
   };
 
   // show setup block and render similar wizards
-  var renderSetup = function (ctx, props) {
-    // generate users
-    var users = generateUsers(props);
+  var renderSetup = function (ctx, users) {
     // similar block in setup
     var setupSimilar = ctx.querySelector('.setup-similar');
     // get block for list of wizards
@@ -145,7 +125,15 @@ window.getWizardY = function (height) {
     var templateItem = template.content.querySelector('.setup-similar-item');
 
     // render list with generated users
-    renderSimilarWizards(users, templateItem, similarWizardsList);
+    renderSimilarWizards(
+        window.util.getMultipleRandomArrayItems(
+            users,
+            false,
+            setupProps.numberOfUsers
+        ),
+        templateItem,
+        similarWizardsList
+    );
 
     // make block of similar wizards visible
     window.util.toggleClass(setupSimilar, 'hidden');
@@ -243,7 +231,47 @@ window.getWizardY = function (height) {
     userFireball.addEventListener('click', onClickFireball);
   };
 
-  renderSetup(window.setupPopup, setupProps);
+  var successHandler = function (wizards) {
+    renderSetup(window.setupPopup, wizards);
+  };
+
+  var errorHandler = function (errorMessage) {
+    var node = document.createElement('div');
+    var style = node.style;
+    var alertStyle = {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      zIndex: 100,
+      fontSize: '24px',
+      color: 'red',
+      textAlign: 'center',
+      width: '100%',
+      padding: '2vh 0',
+      backgroundColor: '#fff',
+      boxShadow: '0 2px 4px 2px rgba(0, 0, 0, 0.4)',
+    };
+
+    var keys = Object.keys(alertStyle);
+
+    for (var i = 0; i < keys.length; i += 1) {
+      style[keys[i]] = alertStyle[keys[i]];
+    }
+
+    node.textContent = errorMessage;
+    node.id = 'system-alert';
+    document.body.insertAdjacentElement('beforeend', node);
+  };
+
+  var form = window.setupPopup.querySelector('.setup-wizard-form');
+  form.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(form), function () {
+      window.setupPopup.classList.add('hidden');
+    }, errorHandler);
+    evt.preventDefault();
+  });
+
+  window.backend.load(successHandler, errorHandler);
   createSetupListeners(window.setupPopup, setupProps);
 })();
 
